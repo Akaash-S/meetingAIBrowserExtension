@@ -1,0 +1,47 @@
+{
+    "goal": "Build a Chrome browser extension called 'AI Meeting Assistant' with Start and Stop buttons to record online meeting sessions (both mic and system audio). The extension should automatically connect with a backend API for transcription, task extraction, minute-to-minute summary, to-do list generation, and calendar updates with deadlines.",
+    "requirements": {
+      "manifest": {
+        "version": 3,
+        "permissions": ["tabCapture", "storage", "activeTab", "scripting"],
+        "background": { "service_worker": "background.js" },
+        "action": { "default_popup": "popup.html", "default_icon": "icon.png" }
+      },
+      "popup_ui": {
+        "elements": ["Start Button", "Stop Button", "Status Text"],
+        "file": "popup.html"
+      },
+      "popup_logic": {
+        "file": "popup.js",
+        "features": [
+          "Start button captures mic + tab/system audio",
+          "Stop button stops recording and closes connection",
+          "MediaRecorder API streams audio chunks every 1s",
+          "WebSocket connection to backend at ws://localhost:5000/audio"
+        ]
+      },
+      "backend_integration": {
+        "flow": [
+          "Extension captures audio",
+          "Audio chunks sent to backend via WebSocket",
+          "Backend handles transcription (STT via Rapid API)",
+          "Gemini API extracts tasks, action items, and minute-to-minute notes",
+          "To-do items stored in Postgres DB and displayed in Dashboard",
+          "Calendar updated with deadlines via backend API"
+        ]
+      },
+      "auto_updates": {
+        "minute_to_minute": "Every 60 seconds, backend returns a running transcript/summary back to extension UI",
+        "tasks": "Tasks are extracted and shown inside To-Do list page",
+        "calendar": "Deadlines from tasks auto-updated in calendar"
+      },
+      "tech_stack": {
+        "extension": "HTML, CSS, JavaScript, Manifest v3",
+        "backend": "Python Flask",
+        "database": "Neon PostgreSQL (Dev), AWS RDS (Prod)",
+        "storage": "Supabase (Dev), AWS S3 (Prod)",
+        "apis": ["Rapid API Speech-to-Text", "Gemini API for task extraction"]
+      }
+    },
+    "output": "Generate a fully working Chrome extension project folder with manifest.json, popup.html, popup.js, background.js, and integration code for audio streaming and backend connection."
+  }  

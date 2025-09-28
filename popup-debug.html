@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Meeting Assistant - Debug</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .debug-toggle {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .debug-toggle:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Meeting Assistant</h1>
+        <div id="status-display">
+            <p id="status-text">Idle</p>
+            <p id="timer">00:00</p>
+        </div>
+        <div class="buttons">
+            <button id="startButton">Start Recording</button>
+            <button id="stopButton" disabled>Stop Recording</button>
+        </div>
+        <div id="meeting-platform">
+            <p>Detected: <span id="platform-name">None</span></p>
+        </div>
+        <div id="transcription-preview">
+            <h2>Live Transcription</h2>
+            <p id="transcript-text">Waiting for audio...</p>
+        </div>
+        
+        <button class="debug-toggle" onclick="toggleDebug()">Toggle Debug Info</button>
+        <div id="debug-info" class="debug-info" style="display: none;">
+            <div id="debug-log">Debug information will appear here...</div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+    <script>
+        // Debug logging
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addDebugLog(message, type = 'log') {
+            const debugDiv = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            logEntry.style.color = type === 'error' ? '#dc3545' : type === 'warn' ? '#ffc107' : '#000';
+            debugDiv.appendChild(logEntry);
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addDebugLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addDebugLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addDebugLog(args.join(' '), 'warn');
+        };
+        
+        function toggleDebug() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Override the showMessage function to also log to debug
+        const originalShowMessage = window.showMessage;
+        window.showMessage = function(message, type) {
+            if (originalShowMessage) {
+                originalShowMessage(message, type);
+            }
+            addDebugLog(`UI Message [${type}]: ${message}`, type);
+        };
+        
+        // Log when popup loads
+        console.log('Debug popup loaded');
+    </script>
+</body>
+</html>
